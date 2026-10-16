@@ -1,0 +1,75 @@
+{
+  "sites": {
+    "items": [
+      {
+        "name": "Studio",
+        "description": "Synthetic workspace",
+        "timezone": "America/New_York",
+        "totalDevices": 2,
+        "offlineDevices": 1,
+        "pendingUpdates": 1,
+        "wanUptime": 99
+      }
+    ],
+    "partial": false,
+    "degraded": true,
+    "notice": null
+  },
+  "devices": {
+    "items": [
+      {
+        "name": "Studio gateway",
+        "model": "UDM SE",
+        "productLine": "network",
+        "status": "online",
+        "version": "4.1.13",
+        "firmwareStatus": "upToDate",
+        "updateAvailable": null
+      }
+    ],
+    "partial": false,
+    "degraded": false,
+    "notice": null
+  },
+  "isp": {
+    "items": [
+      {
+        "label": "Site / host 1",
+        "metricTime": "2026-01-01T12:05:00+00:00",
+        "ispName": "Synthetic ISP",
+        "avgLatency": 10,
+        "maxLatency": 20,
+        "download_kbps": 1200,
+        "upload_kbps": 300,
+        "downtime": 0,
+        "packetLoss": 0,
+        "uptime": 100
+      }
+    ],
+    "partial": false,
+    "degraded": false,
+    "notice": null
+  },
+  "overview": {
+    "summaries": {
+      "sites": {
+        "count": 1,
+        "degraded": true,
+        "partial": false
+      },
+      "devices": {
+        "count": 1,
+        "degraded": false,
+        "partial": false
+      },
+      "isp": {
+        "count": 1,
+        "degraded": false,
+        "partial": false
+      }
+    },
+    "errors": [],
+    "partial": false,
+    "degraded": true
+  }
+}

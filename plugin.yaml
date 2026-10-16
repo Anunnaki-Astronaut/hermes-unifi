@@ -1,0 +1,11 @@
+name: unifi
+label: UniFi
+version: 0.1.0
+description: Read-only official UniFi Site Manager monitoring.
+manifest_version: 1
+requires_hermes: ">=0.22.2"
+config_schema:
+  api_key:
+    type: secret
+    env: UNIFI_API_KEY
+    required: true

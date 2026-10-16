@@ -1,0 +1,23 @@
+{
+  "data": [
+    {
+      "hostId": "synthetic-host",
+      "devices": [
+        {
+          "id": "synthetic-device",
+          "mac": "02:00:00:00:00:01",
+          "ip": "192.0.2.1",
+          "name": "Studio gateway",
+          "model": "UDM SE",
+          "productLine": "network",
+          "status": "online",
+          "version": "4.1.13",
+          "firmwareStatus": "upToDate",
+          "updateAvailable": null
+        }
+      ]
+    }
+  ],
+  "httpStatusCode": 200,
+  "traceId": "synthetic-trace"
+}

@@ -1,0 +1,27 @@
+{
+  "data": [
+    {
+      "siteId": "synthetic-site",
+      "hostId": "synthetic-host",
+      "meta": {
+        "name": "Studio",
+        "desc": "Synthetic workspace",
+        "timezone": "America/New_York",
+        "gatewayMac": "02:00:00:00:00:01"
+      },
+      "statistics": {
+        "counts": {
+          "totalDevice": 2,
+          "offlineDevice": 1,
+          "pendingUpdateDevice": 1,
+          "wifiClient": 99
+        },
+        "percentages": {
+          "wanUptime": 99
+        }
+      }
+    }
+  ],
+  "httpStatusCode": 200,
+  "traceId": "synthetic-trace"
+}

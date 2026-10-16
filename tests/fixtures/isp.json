@@ -1,0 +1,47 @@
+{
+  "data": [
+    {
+      "hostId": "synthetic-host",
+      "siteId": "synthetic-site",
+      "metricType": "5m",
+      "periods": [
+        {
+          "metricTime": "2026-01-01T12:05:00Z",
+          "version": "1",
+          "data": {
+            "wan": {
+              "avgLatency": 10,
+              "maxLatency": 20,
+              "download_kbps": 1200,
+              "upload_kbps": 300,
+              "downtime": 0,
+              "uptime": 100,
+              "packetLoss": 0,
+              "ispName": "Synthetic ISP",
+              "ispAsn": "00000"
+            }
+          }
+        },
+        {
+          "metricTime": "2026-01-01T12:00:00Z",
+          "version": "1",
+          "data": {
+            "wan": {
+              "avgLatency": 999,
+              "maxLatency": 20,
+              "download_kbps": 1200,
+              "upload_kbps": 300,
+              "downtime": 0,
+              "uptime": 100,
+              "packetLoss": 0,
+              "ispName": "Synthetic ISP",
+              "ispAsn": "00000"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "httpStatusCode": 200,
+  "traceId": "synthetic-trace"
+}
