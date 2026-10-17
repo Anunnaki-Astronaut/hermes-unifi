@@ -167,6 +167,68 @@ def test_partial_and_empty(monkeypatch, secret):
     assert c.view_data('sites') == {'items':[], 'partial':True, 'degraded':False,'notice':'Only the first upstream page is shown.'}
 
 
+def test_neutral_device_statuses():
+    assert c.NEUTRAL_DEVICE_STATUSES == {None, 'online', 'unknown'}
+    assert 'Unknown' not in c.NEUTRAL_DEVICE_STATUSES
+
+
+@pytest.mark.parametrize('status,degraded', [
+    (None, False), ('online', False), ('unknown', False),
+    ('offline', True), ('disconnected', True), ('updating', True),
+    ('', True), ('Unknown', True), ('UNKNOWN', True),
+])
+def test_device_status_degraded(monkeypatch, secret, status, degraded):
+    rows = [{'devices': [{'status': status}]}]
+    monkeypatch.setattr(c, 'request_data', lambda _: (rows, False, secret))
+    data = c.view_data('devices')
+    assert data['items'][0]['status'] == status
+    assert data['degraded'] is degraded
+    assert data['partial'] is False
+    assert data['notice'] is None
+
+
+@pytest.mark.parametrize('signal', [
+    'offlineDevice', 'pendingUpdateDevice', 'wanUptime', 'packetLoss', 'downtime',
+])
+@pytest.mark.parametrize('degraded', [False, True])
+def test_non_status_degraded_signals(monkeypatch, secret, signal, degraded):
+    value = (99 if degraded else 100) if signal == 'wanUptime' else int(degraded)
+    if signal in ('offlineDevice', 'pendingUpdateDevice', 'wanUptime'):
+        view = 'sites'
+        group = 'percentages' if signal == 'wanUptime' else 'counts'
+        rows = [{'statistics': {group: {signal: value}}}]
+    else:
+        view = 'isp'
+        rows = [{'hostId': 'synthetic-host', 'siteId': 'synthetic-site',
+                 'metricType': '5m', 'periods': [
+                     {'metricTime': '2026-01-01T00:00:00Z',
+                      'data': {'wan': {signal: value}}}]}]
+    monkeypatch.setattr(c, 'request_data', lambda _: (rows, False, secret))
+    assert c.view_data(view)['degraded'] is degraded
+
+
+@pytest.mark.parametrize('status,degraded', [('unknown', False), ('offline', True)])
+def test_overview_device_status(monkeypatch, secret, status, degraded):
+    rows = {
+        'sites': [{'statistics': {'counts': {'offlineDevice': 0, 'pendingUpdateDevice': 0},
+                                  'percentages': {'wanUptime': 100}}}],
+        'devices': [{'devices': [{'status': status}]}],
+        'isp': [{'hostId': 'synthetic-host', 'siteId': 'synthetic-site',
+                 'metricType': '5m', 'periods': [
+                     {'metricTime': '2026-01-01T00:00:00Z',
+                      'data': {'wan': {'packetLoss': 0, 'downtime': 0, 'uptime': 100}}}]}],
+    }
+    monkeypatch.setattr(c, 'request_data', lambda view: (rows[view], False, secret))
+    assert c.overview_data() == {
+        'summaries': {
+            'sites': {'count': 1, 'degraded': False, 'partial': False},
+            'devices': {'count': 1, 'degraded': degraded, 'partial': False},
+            'isp': {'count': 1, 'degraded': False, 'partial': False},
+        },
+        'errors': [], 'partial': False, 'degraded': degraded,
+    }
+
+
 @pytest.mark.parametrize('value,expected', [('120', 120), ('5.3', 6)])
 def test_backoff_prevents_outbound_call(monkeypatch, secret, value, expected):
     monkeypatch.setattr(c.time, 'monotonic', lambda: 100)

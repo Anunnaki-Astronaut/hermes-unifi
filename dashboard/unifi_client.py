@@ -16,6 +16,7 @@ from urllib.request import Request, HTTPSHandler, HTTPRedirectHandler, ProxyHand
 ORIGIN = "https://api.ui.com/v1"
 ENDPOINTS = {"sites": "/sites", "devices": "/devices", "isp": "/isp-metrics/5m"}
 MAX_BYTES = 5 * 1024 * 1024
+NEUTRAL_DEVICE_STATUSES = {None, "online", "unknown"}
 _retry_until = 0.0
 MESSAGES = {
     "not_configured": "Configure the profile-scoped UniFi API key in plugin settings.",
@@ -198,7 +199,7 @@ def view_data(view):
     items = project(view, rows, key)
     degraded = any((r.get("offlineDevices") or 0) > 0 or (r.get("pendingUpdates") or 0) > 0
                    or (r.get("wanUptime") is not None and r["wanUptime"] < 100)
-                   or (r.get("status") not in (None, "online"))
+                   or (r.get("status") not in NEUTRAL_DEVICE_STATUSES)
                    or (r.get("packetLoss") or 0) > 0 or (r.get("downtime") or 0) > 0 for r in items)
     return {"items": items, "partial": truncated, "degraded": degraded,
             "notice": "Only the first upstream page is shown." if truncated else None}

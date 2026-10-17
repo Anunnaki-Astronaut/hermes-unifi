@@ -21,6 +21,6 @@ jobs:
         run: |
           for view in overview sites devices isp; do
             node --experimental-vm-modules scripts/render_screenshot.cjs "$view" "/tmp/$view.html"
+            cmp "/tmp/$view.html" "docs/screenshots/$view.html"
           done
-          cmp /tmp/overview.html docs/screenshots/overview.html
       - run: git diff --check

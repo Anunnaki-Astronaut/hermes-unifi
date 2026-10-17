@@ -91,3 +91,105 @@ def test_renderer_contract():
     assert 'useQuery({' in source and 'refetchInterval: 60000' in source
     assert not re.search(r'\bfetch\(|setInterval|XMLHttpRequest|https://',source)
     assert 'defaultEnabled: false' in source
+
+
+def render_preview(tmp_path, view, payload=None):
+    import subprocess
+    script = (ROOT/'scripts/render_screenshot.cjs').read_text()
+    if payload is not None:
+        script = script.replace('const element =', f'payloads[{json.dumps(view)}] = {json.dumps(payload)};\nconst element =', 1)
+    script = script.replace('const element =', '''
+function freeze(value) {
+  if (value && typeof value === 'object') {
+    Object.values(value).forEach(freeze);
+    Object.freeze(value);
+  }
+}
+freeze(payloads);
+const sourceSnapshot = JSON.parse(JSON.stringify(payloads));
+const element =''', 1)
+    # Compare the actual JS objects consumed by the renderer, not the Python input.
+    script = script.replace('  const output =', '''
+  require('node:assert/strict').deepStrictEqual(payloads, sourceSnapshot,
+    'Display formatting must not mutate source payloads');
+  const output =''', 1)
+    output = tmp_path/f'{view}.html'
+    subprocess.run(['node', '--experimental-vm-modules', '-', view, str(output)],
+                   input=script, text=True, cwd=ROOT/'scripts', check=True, capture_output=True)
+    return output.read_text()
+
+
+@pytest.mark.parametrize('view', ['overview', 'sites', 'devices', 'isp'])
+def test_deterministic_previews(tmp_path, view):
+    html = render_preview(tmp_path, view)
+    assert html == (ROOT/f'docs/screenshots/{view}.html').read_text()
+    assert html.count(' aria-pressed="true"') == 1
+    assert html.count(' aria-pressed="false"') == 3
+    assert '[aria-pressed="true"]' in html  # CSS must remain raw text.
+    assert 'Data notes' in html and 'Read only' in html
+    if view != 'overview':
+        assert '<th scope="col"' in html
+        assert 'tabindex="0" role="region"' in html
+        assert '1 item' in html
+        title = {'sites': 'Sites', 'devices': 'Devices', 'isp': 'ISP Health'}[view]
+        assert html.count(f'<h2>{title}</h2>') == 1
+        assert f'<section class="table-shell" aria-label="UniFi {title}">' in html
+        assert f'<table aria-label="UniFi {title}">' in html
+
+
+def test_display_formatting_does_not_mutate_source_payloads(tmp_path):
+    # render_preview freezes all nested JS data and asserts deep equality after render.
+    # These raw enum/empty values must format differently without changing that data.
+    payload = {'items': [
+        {'name': 'Example', 'status': 'offline', 'firmwareStatus': 'updateAvailable', 'version': '', 'model': 'Unknown'},
+        {'name': 'Second', 'status': 'online', 'firmwareStatus': 'upToDate', 'updateAvailable': None},
+    ], 'partial': True, 'degraded': True, 'notice': 'Only the first upstream page is shown.'}
+    html = render_preview(tmp_path, 'devices', payload)
+    assert 'Partial data.' in html and payload['notice'] in html
+    assert 'Degraded —' in html and 'Needs attention' in html
+    assert '>Offline</span>' in html and '>Online</span>' in html
+    assert '>Update available</span>' in html and '>Up to date</span>' in html
+    assert '<span class="muted">Unknown</span>' in html
+    assert '<span class="muted">—</span>' in html
+    assert 'class="row-attention"' in html
+
+
+def test_summary_and_empty_states(tmp_path):
+    html = render_preview(tmp_path, 'overview', {'summaries': {
+        'sites': {'count': 0, 'partial': True, 'degraded': False},
+        'devices': {'count': 2, 'partial': False, 'degraded': True},
+        'isp': {'count': 1, 'partial': False, 'degraded': False},
+    }})
+    assert 'Partial count · Incomplete reporting' in html
+    assert 'Needs attention' in html and 'No reported issues' in html
+    html = render_preview(tmp_path, 'sites', {'items': []})
+    assert '0 items' in html and 'No data available.' in html
+
+
+def test_numeric_columns_and_isp_attention(tmp_path):
+    html = render_preview(tmp_path, 'isp', {'items': [{'label': '123', 'packetLoss': 1, 'downtime': 0}]})
+    assert '<td><span>123</span><span class="row-note">Needs attention</span></td>' in html
+    assert '<td class="numeric"><span>1</span></td>' in html
+    assert '<td class="numeric"><span>0</span></td>' in html
+    assert '<td class="numeric"><span class="muted">—</span></td>' in html
+    assert 'latency (ms)' not in html and 'Uptime (%)' not in html
+
+
+def test_raw_unknown_device_status_is_muted_without_row_attention(tmp_path):
+    html = render_preview(tmp_path, 'devices', {'items': [
+        {'name': 'Unreported device', 'status': 'unknown'},
+    ], 'degraded': False})
+    assert '<span class="muted">Unknown</span>' in html
+    assert '<tr class="row-attention">' not in html
+    assert 'Needs attention' not in html
+    assert 'Degraded —' not in html
+
+
+def test_firmware_only_availability_keeps_pill_without_row_attention(tmp_path):
+    html = render_preview(tmp_path, 'devices', {'items': [
+        {'name': 'Online device', 'status': 'online', 'firmwareStatus': 'updateAvailable'},
+    ], 'degraded': False})
+    assert '<span class="pill attention">Update available</span>' in html
+    assert '<tr class="row-attention">' not in html
+    assert 'Needs attention' not in html
+    assert 'Degraded —' not in html
