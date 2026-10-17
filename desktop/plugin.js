@@ -149,7 +149,7 @@ function Page() {
     !health.isLoading && !health.error && !configured ? jsx('p', { children: 'Unconfigured. Open Settings → Plugins → UniFi and save a profile-scoped API key.' }) : null,
     health.error || (configured && result.error) ? jsx(ErrorState, { title: 'UniFi data unavailable', description: result.data ? 'Degraded: refresh failed. Previously loaded data is shown.' : 'Check configuration or retry later.', onRetry: refresh }) : null,
     configured ? jsx(View, { tab, data: result.data?.data }) : null,
-    jsxs('footer', { children: [jsx('p', { className: 'disclaimer', children: 'Unofficial integration. UniFi is a trademark of Ubiquiti Inc. This project is not affiliated with or endorsed by Ubiquiti.' }), jsx('h2', { children: 'Data notes' }), jsx('ul', { children: ['Refreshes every 60 seconds', 'Latest ISP period only', 'Unknown means not reported', 'Site / host labels are temporary row numbers'].map(note => jsx('li', { children: note }, note)) })] }),
+    jsxs('footer', { children: [jsx('p', { className: 'disclaimer', children: 'Unofficial integration. UniFi is a trademark of Ubiquiti Inc. This project is not affiliated with or endorsed by Ubiquiti.' }), jsx('h2', { children: 'Data notes' }), jsx('ul', { children: ['Refreshes every 60 seconds', 'Latest ISP period only', 'Unknown means not reported', 'Site / host numbers are temporary and may change after refresh'].map(note => jsx('li', { children: note }, note)) })] }),
   ] });
 }
 

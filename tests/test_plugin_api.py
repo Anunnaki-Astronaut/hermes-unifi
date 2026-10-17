@@ -130,6 +130,8 @@ def test_deterministic_previews(tmp_path, view):
     assert html.count(' aria-pressed="false"') == 3
     assert '[aria-pressed="true"]' in html  # CSS must remain raw text.
     assert 'Data notes' in html and 'Read only' in html
+    assert html.count('Site / host numbers are temporary and may change after refresh') == 1
+    assert 'Site / host labels are temporary row numbers' not in html
     if view != 'overview':
         assert '<th scope="col"' in html
         assert 'tabindex="0" role="region"' in html
