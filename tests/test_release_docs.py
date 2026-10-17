@@ -65,7 +65,7 @@ def test_secret_scan_safety_contract():
                  'permissions:\n  contents: read', 'fetch-depth: 0',
                  'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683',
                  'trufflesecurity/trufflehog@b84c3d14d189e16da175e2c27fa8136603783ffc',
-                 'version: v3.90.12', 'extra_args: --no-verification --results=verified,unknown'):
+                 'version: 3.90.12', 'extra_args: --no-verification --results=verified,unknown'):
         assert term in text
     assert 'secrets.' not in text
     assert ': write' not in text
