@@ -1,8 +1,10 @@
 # Hermes UniFi 0.1.0
 
-Native unified Hermes plugin for read-only UniFi Site Manager monitoring. Requires Hermes >=0.22.2. The Desktop page is disabled by default; enable UniFi in Plugins and enter the API key in its masked secret field. Hermes stores it in the selected profile as `UNIFI_API_KEY`. No endpoint setting exists.
+Unofficial integration for read-only monitoring using the official UniFi Site Manager API. Requires Hermes >=0.22.2. The Desktop page is disabled by default; enable UniFi in Plugins and enter the API key in its masked secret field. Hermes stores it in the selected profile as `UNIFI_API_KEY`. No endpoint setting exists.
 
 The `/unifi` page, sidebar entry, and “Open UniFi” command provide Overview, Sites, Devices, and ISP Health. Shared SDK React Query polls every 60 seconds. Loading, unconfigured, empty, partial-error, stale refresh failure, and degraded states are explicit. No live API access is needed for tests or previews.
+
+Unofficial integration. UniFi is a trademark of Ubiquiti Inc. This project is not affiliated with or endorsed by Ubiquiti.
 
 ## Data contract
 

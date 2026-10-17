@@ -1,7 +1,7 @@
 name: unifi
 label: UniFi
 version: 0.1.0
-description: Read-only official UniFi Site Manager monitoring.
+description: Read-only unofficial integration using the official UniFi Site Manager API.
 manifest_version: 1
 requires_hermes: ">=0.22.2"
 config_schema:

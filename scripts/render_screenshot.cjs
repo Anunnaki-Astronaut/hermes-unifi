@@ -42,7 +42,7 @@ function render(node) {
   await plugin.evaluate();
   let page;
   plugin.namespace.default.register({ rest() { throw new Error('Network forbidden'); }, registerMany(entries) { page = entries.find(e => e.area === 'routes').render; } });
-  const html = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'"><title>UniFi synthetic preview</title><style>:root{--ui-text-primary:#e7edf5;--ui-text-secondary:#9daec2;--ui-bg-card:#182332;--ui-stroke-secondary:#344256;--ui-yellow:#e4b450}body{background:#0e1723;font-family:system-ui;margin:0}button{background:#23354b;color:#e7edf5;padding:10px 16px;border:1px solid #344256;border-radius:6px}</style>' + render(page()) + '</html>\n';
+  const html = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'"><title>UniFi synthetic preview</title><style>:root{--ui-text-primary:#e7edf5;--ui-text-secondary:#9daec2;--ui-bg-card:#182332;--ui-stroke-secondary:#344256;--ui-yellow:#e4b450;--ui-success:#6bc58a;--ui-red:#ef7b83}body{background:#0e1723;font-family:system-ui;margin:0}button{background:#23354b;color:#e7edf5;padding:10px 16px;border:1px solid #344256;border-radius:6px}</style>' + render(page()) + '</html>\n';
   const output = path.resolve(process.argv[3] || path.join(root, `docs/screenshots/${tab}.html`));
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, html);

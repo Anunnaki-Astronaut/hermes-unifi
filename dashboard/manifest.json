@@ -1,5 +1,5 @@
 {
   "name": "unifi", "label": "UniFi", "version": "0.1.0",
-  "description": "Read-only Site Manager backend", "icon": "Server",
+  "description": "Read-only unofficial integration using the official UniFi Site Manager API.", "icon": "Server",
   "tab": {"hidden": true}, "slots": [], "api": "plugin_api.py"
 }
