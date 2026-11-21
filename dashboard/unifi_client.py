@@ -11,11 +11,15 @@ import time
 from http.client import HTTPException as TransportError
 from datetime import datetime, timezone
 from urllib.error import HTTPError, URLError
+from urllib.parse import quote
 from urllib.request import Request, HTTPSHandler, HTTPRedirectHandler, ProxyHandler, build_opener
 
 ORIGIN = "https://api.ui.com/v1"
 ENDPOINTS = {"sites": "/sites", "devices": "/devices", "isp": "/isp-metrics/5m"}
+PAGINATED_VIEWS = frozenset({"sites", "devices"})
 MAX_BYTES = 5 * 1024 * 1024
+MAX_PAGES = 10
+MAX_TOTAL_BYTES = 20 * 1024 * 1024
 NEUTRAL_DEVICE_STATUSES = {None, "online", "unknown"}
 _retry_until = 0.0
 MESSAGES = {
@@ -65,7 +69,7 @@ def retry_seconds(value):
     if not isinstance(value, str) or len(value) > 32:
         return None
     value = value.strip(' \t')
-    if not re.fullmatch(r"[0-9]{1,6}(?:\.[0-9]{1,6})?", value):
+    if not re.fullmatch(r"[0-9]{1,6}(?:\.[0-9]{1,18})?", value):
         return None
     whole, _, fraction = value.partition('.')
     # Exact ceiling avoids rounding a positive fraction down to an integer.
@@ -82,27 +86,52 @@ def request_data(view, timeout=10):
     remaining = math.ceil(_retry_until - time.monotonic())
     if remaining > 0:
         raise SafeError("rate_limited", 429, remaining)
-    req = Request(ORIGIN + ENDPOINTS[view], headers={"X-API-KEY": key, "Accept": "application/json", "User-Agent": "Hermes-UniFi/0.1.0"}, method="GET")
+    base = ORIGIN + ENDPOINTS[view]
+    url = base
+    rows, total_bytes, seen_tokens = [], 0, set()
     try:
         # No environment proxies, redirect forwarding, or configurable TLS context.
         opener = build_opener(ProxyHandler({}), HTTPSHandler(context=ssl.create_default_context()), NoRedirect())
-        with opener.open(req, timeout=timeout) as response:
-            raw = response.read(MAX_BYTES + 1)
-        if len(raw) > MAX_BYTES:
-            raise SafeError("invalid_upstream_response")
-        payload = json.loads(raw)
-        if (not isinstance(payload, dict) or type(payload.get("httpStatusCode")) is not int
-                or payload["httpStatusCode"] != 200 or not isinstance(payload.get("traceId"), str)
-                or not isinstance(payload.get("data"), list)
-                or any(not isinstance(row, dict) for row in payload["data"])):
-            raise SafeError("invalid_upstream_response")
-        # Never project the envelope, trace, token, or key into renderer output.
-        return payload["data"], bool(payload.get("nextToken")), key
+        for page in range(MAX_PAGES):
+            allowance = min(MAX_BYTES, MAX_TOTAL_BYTES - total_bytes) if view in PAGINATED_VIEWS else MAX_BYTES
+            if allowance <= 0:
+                return rows, True, key
+            req = Request(url, headers={"X-API-KEY": key, "Accept": "application/json", "User-Agent": "Hermes-UniFi/0.2.0"}, method="GET")
+            with opener.open(req, timeout=timeout) as response:
+                raw = response.read(allowance + 1)
+            if len(raw) > allowance:
+                if allowance == MAX_BYTES:
+                    raise SafeError("invalid_upstream_response")
+                # Do not parse or project a partially read page.
+                return rows, True, key
+            payload = json.loads(raw)
+            if (not isinstance(payload, dict) or type(payload.get("httpStatusCode")) is not int
+                    or payload["httpStatusCode"] != 200 or not isinstance(payload.get("traceId"), str)
+                    or not isinstance(payload.get("data"), list)
+                    or any(not isinstance(row, dict) for row in payload["data"])):
+                raise SafeError("invalid_upstream_response")
+            rows.extend(payload["data"])
+            total_bytes += len(raw)
+            if view not in PAGINATED_VIEWS:
+                return rows, False, key
+            token = payload.get("nextToken")
+            if token is None or token == "":
+                return rows, False, key
+            if not isinstance(token, str) or len(token) > 1024 or not token.isprintable() or token in seen_tokens:
+                raise SafeError("invalid_upstream_response")
+            seen_tokens.add(token)
+            if page + 1 >= MAX_PAGES or total_bytes >= MAX_TOTAL_BYTES:
+                return rows, True, key
+            # Only the opaque upstream cursor may alter the fixed request URL.
+            url = base + "?nextToken=" + quote(token, safe="")
+        return rows, True, key
     except HTTPError as exc:
         status = exc.code
         retry = retry_seconds(exc.headers.get("Retry-After")) if exc.headers else None
         exc.close()
-        if status == 429 and retry is not None:
+        if status == 429:
+            # A missing or malformed header must not disable the cooldown.
+            retry = 60 if retry is None else retry
             _retry_until = max(_retry_until, time.monotonic() + retry)
         code = "authentication_failed" if status in (401, 403) else "rate_limited" if status == 429 else "upstream_http_error"
         raise SafeError(code, 401 if status in (401, 403) else 429 if status == 429 else 502, retry if status == 429 else None) from None
@@ -202,7 +231,7 @@ def view_data(view):
                    or (r.get("status") not in NEUTRAL_DEVICE_STATUSES)
                    or (r.get("packetLoss") or 0) > 0 or (r.get("downtime") or 0) > 0 for r in items)
     return {"items": items, "partial": truncated, "degraded": degraded,
-            "notice": "Only the first upstream page is shown." if truncated else None}
+            "notice": "Some upstream pages were not retrieved; displayed counts may be incomplete." if truncated else None}
 
 
 def overview_data():

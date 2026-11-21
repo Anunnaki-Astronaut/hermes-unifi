@@ -1,11 +1,39 @@
 name: unifi
 label: UniFi
-version: 0.1.0
-description: Read-only unofficial integration using the official UniFi Site Manager API.
+version: 0.3.0
+description: Read-only unofficial integration using the official UniFi Site Manager API and the official UniFi Network API on your console, with plain-English diagnostics.
 manifest_version: 1
 requires_hermes: ">=0.22.2"
+provides_tools:
+  - unifi_status
+  - unifi_diagnose
+  - unifi_devices
+  - unifi_clients
 config_schema:
   api_key:
     type: secret
     env: UNIFI_API_KEY
-    required: true
+    label: Site Manager API key (cloud)
+    description: From unifi.ui.com → Settings → API Keys. Read-only. Provides site, device summary and ISP metrics.
+    required: false
+  console_host:
+    type: string
+    label: UniFi console host (local)
+    description: Private LAN address or local hostname of your console, for example 192.168.1.1 or unifi.local. No scheme or path. Enables device, client, Wi-Fi and port diagnostics.
+    required: false
+  network_api_key:
+    type: secret
+    env: UNIFI_NETWORK_API_KEY
+    label: Network API key (console)
+    description: From the console's UniFi Network → Integrations (not Settings → Control Plane → Console). Stored in the selected profile's protected credential store and never returned to the desktop page.
+    required: false
+  console_cert_sha256:
+    type: string
+    label: Console certificate SHA-256 pin
+    description: Optional. If your console uses a self-signed certificate, verify its SHA-256 fingerprint and paste it here. See the install guide for the Firefox steps. Leave blank if the console certificate is already trusted by the backend.
+    required: false
+  show_addresses:
+    type: boolean
+    label: Show IP addresses
+    description: Off by default. When on, device and client IP addresses appear in views and tool results. MAC addresses are never shown.
+    default: false

@@ -3,4 +3,15 @@ __pycache__/
 .pytest_cache/
 *.pyc
 .env
+.env.*
+*.key
+*.pem
 node_modules/
+.DS_Store
+/HANDOFF.md
+/AGENTS.md
+/.hermes/
+/.graphifyignore
+/graphify-out/
+/release/
+/RELEASE_NOTES_*.md

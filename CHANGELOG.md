@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+## 0.3.0 - 2026-11-20
+
+- Connect an optional local UniFi console to see connected clients and check device health, Wi-Fi, ports, and WAN. Diagnostics explains what it found and what to check next. Hermes still cannot change the network.
+- Use the dashboard gear to open native Settings. Follow the Desktop theme or system setting, choose light or dark, or customize a palette in Theme Maker. Preferences stay scoped to the Desktop connection and profile.
+- Read the console over verified HTTPS or with a user-confirmed SHA-256 certificate pin. The setup guide shows how to copy the fingerprint in Firefox without accepting the browser warning. `UNIFI_NETWORK_API_KEY` is stored for the selected Hermes profile, not in the Desktop renderer.
+- Ask Hermes about network health and connected clients with `unifi_status`, `unifi_diagnose`, `unifi_devices`, and `unifi_clients`. IP addresses are hidden by default. The plugin does not return the MAC address field or raw API identifiers.
+- Follow Site Manager pagination and honor rate-limit cooldowns. Diagnostics flags partial console reads. Check ISP Health directly for Site Manager ISP feed errors, which Diagnostics can omit.
+
 ## 0.1.0 - 2026-10-16
 
 First public release.

@@ -1,0 +1,73 @@
+{
+  "/info": {"applicationVersion": "9.9.99"},
+  "/sites": {"offset": 0, "limit": 200, "count": 1, "totalCount": 1,
+             "data": [{"id": "11111111-1111-4111-8111-111111111111", "internalReference": "default", "name": "Synthetic Home"}]},
+  "/sites/11111111-1111-4111-8111-111111111111/devices": {"offset": 0, "limit": 200, "count": 3, "totalCount": 3, "data": [
+    {"id": "aaaaaaaa-0000-4000-8000-000000000001", "name": "Gateway synthetic-host", "model": "UCG-Synthetic", "supported": true,
+     "macAddress": "02:00:00:aa:bb:01", "ipAddress": "10.99.0.1", "state": "ONLINE", "firmwareVersion": "4.0.0", "firmwareUpdatable": true,
+     "features": ["gateway", "switching"], "interfaces": ["ports"]},
+    {"id": "aaaaaaaa-0000-4000-8000-000000000002", "name": "Office AP", "model": "U7-Synthetic", "supported": true,
+     "macAddress": "02:00:00:aa:bb:02", "ipAddress": "10.99.0.2", "state": "ONLINE", "firmwareVersion": "7.0.0", "firmwareUpdatable": false,
+     "features": ["accessPoint"], "interfaces": ["radios", "ports"]},
+    {"id": "aaaaaaaa-0000-4000-8000-000000000003", "name": "Garage AP 10.99.0.3", "model": "U6-Synthetic", "supported": false,
+     "macAddress": "02:00:00:aa:bb:03", "ipAddress": "10.99.0.3", "state": "OFFLINE", "firmwareVersion": "6.0.0", "firmwareUpdatable": false,
+     "features": ["accessPoint"], "interfaces": ["radios", "ports"]}
+  ]},
+  "/sites/11111111-1111-4111-8111-111111111111/devices/aaaaaaaa-0000-4000-8000-000000000001": {
+    "id": "aaaaaaaa-0000-4000-8000-000000000001", "name": "Gateway synthetic-host", "model": "UCG-Synthetic", "supported": true,
+    "macAddress": "02:00:00:aa:bb:01", "ipAddress": "10.99.0.1", "state": "ONLINE", "firmwareVersion": "4.0.0", "firmwareUpdatable": true,
+    "configurationId": "cfg-1", "features": {"switching": {"lags": []}},
+    "interfaces": {"ports": [
+      {"idx": 1, "state": "UP", "connector": "RJ45", "maxSpeedMbps": 1000, "speedMbps": 1000, "poe": {"enabled": true, "standard": "802.3at", "state": "UP", "type": 2}},
+      {"idx": 2, "state": "UP", "connector": "RJ45", "maxSpeedMbps": 1000, "speedMbps": 100},
+      {"idx": 3, "state": "DOWN", "connector": "RJ45", "maxSpeedMbps": 1000},
+      {"idx": 4, "state": "UP", "connector": "RJ45", "maxSpeedMbps": 1000, "speedMbps": 1000, "poe": {"enabled": true, "standard": "802.3af", "state": "LIMITED", "type": 1}}
+    ], "radios": []}},
+  "/sites/11111111-1111-4111-8111-111111111111/devices/aaaaaaaa-0000-4000-8000-000000000001/statistics/latest": {
+    "uptimeSec": 864000, "lastHeartbeatAt": "2026-11-14T12:00:00Z", "nextHeartbeatAt": "2026-11-14T12:01:00Z",
+    "cpuUtilizationPct": 92.5, "memoryUtilizationPct": 61.0, "loadAverage1Min": 2.1,
+    "uplink": {"txRateBps": 1200000, "rxRateBps": 45000000}, "interfaces": {"radios": []}},
+  "/sites/11111111-1111-4111-8111-111111111111/devices/aaaaaaaa-0000-4000-8000-000000000002": {
+    "id": "aaaaaaaa-0000-4000-8000-000000000002", "name": "Office AP", "model": "U7-Synthetic", "supported": true,
+    "macAddress": "02:00:00:aa:bb:02", "ipAddress": "10.99.0.2", "state": "ONLINE", "firmwareVersion": "7.0.0", "firmwareUpdatable": false,
+    "configurationId": "cfg-2", "features": {"accessPoint": {}}, "uplink": {"deviceId": "aaaaaaaa-0000-4000-8000-000000000001"},
+    "interfaces": {"ports": [{"idx": 1, "state": "UP", "connector": "RJ45", "maxSpeedMbps": 2500, "speedMbps": 2500}],
+                   "radios": [
+                     {"wlanStandard": "802.11ax", "frequencyGHz": 2.4, "channel": 3, "channelWidthMHz": 40, "txPowerMode": "HIGH"},
+                     {"wlanStandard": "802.11be", "frequencyGHz": 5, "channel": 36, "channelWidthMHz": 80, "txPowerMode": "AUTO"}
+                   ]}},
+  "/sites/11111111-1111-4111-8111-111111111111/devices/aaaaaaaa-0000-4000-8000-000000000002/statistics/latest": {
+    "uptimeSec": 420, "lastHeartbeatAt": "2026-11-14T12:00:00Z", "nextHeartbeatAt": "2026-11-14T12:01:00Z",
+    "cpuUtilizationPct": 12.0, "memoryUtilizationPct": 44.0, "loadAverage1Min": 0.3,
+    "uplink": {"txRateBps": 300000, "rxRateBps": 900000},
+    "interfaces": {"radios": [{"frequencyGHz": 2.4, "txRetriesPct": 31.0}, {"frequencyGHz": 5, "txRetriesPct": 4.0}]}},
+  "/sites/11111111-1111-4111-8111-111111111111/devices/aaaaaaaa-0000-4000-8000-000000000003": {
+    "id": "aaaaaaaa-0000-4000-8000-000000000003", "name": "Garage AP 10.99.0.3", "model": "U6-Synthetic", "supported": false,
+    "macAddress": "02:00:00:aa:bb:03", "ipAddress": "10.99.0.3", "state": "OFFLINE", "firmwareVersion": "6.0.0", "firmwareUpdatable": false,
+    "configurationId": "cfg-3", "features": {"accessPoint": {}}, "uplink": {"deviceId": "aaaaaaaa-0000-4000-8000-000000000001"},
+    "interfaces": {"ports": [], "radios": [{"wlanStandard": "802.11ax", "frequencyGHz": 5, "channel": 36, "channelWidthMHz": 80, "txPowerMode": "AUTO"}]}},
+  "/sites/11111111-1111-4111-8111-111111111111/devices/aaaaaaaa-0000-4000-8000-000000000003/statistics/latest": {
+    "uptimeSec": 0, "interfaces": {"radios": []}},
+  "/sites/11111111-1111-4111-8111-111111111111/clients": {"offset": 0, "limit": 200, "count": 3, "totalCount": 3, "data": [
+    {"id": "cccccccc-0000-4000-8000-000000000001", "name": "Desk PC", "type": "WIRED", "connectedAt": "2026-11-14T08:00:00Z",
+     "ipAddress": "10.99.0.50", "macAddress": "02:00:00:cc:dd:01", "uplinkDeviceId": "aaaaaaaa-0000-4000-8000-000000000001", "access": {"type": "DEFAULT"}},
+    {"id": "cccccccc-0000-4000-8000-000000000002", "name": "Phone 02:00:00:cc:dd:02", "type": "WIRELESS", "connectedAt": "2026-11-14T09:30:00Z",
+     "ipAddress": "10.99.0.73", "macAddress": "02:00:00:cc:dd:02", "uplinkDeviceId": "aaaaaaaa-0000-4000-8000-000000000003", "access": {"type": "DEFAULT"}},
+    {"id": "cccccccc-0000-4000-8000-000000000003", "name": "Visitor tablet", "type": "WIRELESS", "connectedAt": "2026-11-14T11:00:00Z",
+     "ipAddress": "10.99.5.20", "macAddress": "02:00:00:cc:dd:03", "uplinkDeviceId": "aaaaaaaa-0000-4000-8000-000000000002", "access": {"type": "GUEST", "authorized": false}}
+  ]},
+  "/sites/11111111-1111-4111-8111-111111111111/wans": {"offset": 0, "limit": 200, "count": 1, "totalCount": 1,
+    "data": [{"id": "dddddddd-0000-4000-8000-000000000001", "name": "Internet 1"}]},
+  "/sites/11111111-1111-4111-8111-111111111111/networks": {"offset": 0, "limit": 200, "count": 2, "totalCount": 2, "data": [
+    {"id": "eeeeeeee-0000-4000-8000-000000000001", "name": "Default", "vlanId": 1, "enabled": true, "default": true, "management": "GATEWAY", "metadata": {"origin": "SYSTEM_DEFINED"}},
+    {"id": "eeeeeeee-0000-4000-8000-000000000002", "name": "Guests", "vlanId": 50, "enabled": true, "default": false, "management": "GATEWAY", "metadata": {"origin": "USER_DEFINED"}}
+  ]},
+  "/sites/11111111-1111-4111-8111-111111111111/wifi/broadcasts": {"offset": 0, "limit": 200, "count": 3, "totalCount": 3, "data": [
+    {"id": "ffffffff-0000-4000-8000-000000000001", "name": "Home-Synthetic", "enabled": true, "type": "STANDARD", "metadata": {"origin": "USER_DEFINED"},
+     "network": {"type": "NATIVE"}, "securityConfiguration": {"type": "WPA2_WPA3_PERSONAL"}, "broadcastingDeviceFilter": {"type": "DEVICES"}},
+    {"id": "ffffffff-0000-4000-8000-000000000002", "name": "Guest-Synthetic", "enabled": true, "type": "HOTSPOT", "metadata": {"origin": "USER_DEFINED"},
+     "network": {"type": "SPECIFIC"}, "securityConfiguration": {"type": "OPEN"}, "broadcastingDeviceFilter": {"type": "DEVICES"}},
+    {"id": "ffffffff-0000-4000-8000-000000000003", "name": "Old-IoT", "enabled": false, "type": "STANDARD", "metadata": {"origin": "USER_DEFINED"},
+     "network": {"type": "NATIVE"}, "securityConfiguration": {"type": "WPA2_PERSONAL"}, "broadcastingDeviceFilter": {"type": "DEVICES"}}
+  ]}
+}

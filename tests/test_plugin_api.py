@@ -40,11 +40,13 @@ def test_health(http,monkeypatch,configured):
     monkeypatch.setattr(api.client,'request_data',lambda _: pytest.fail('health contacted transport'))
     response = http.get('/health')
     assert response.status_code == 200
-    assert response.json() == {'ok':True,'configured':configured,'connected':None,'read_only':True,'version':'0.1.0'}
+    assert response.json() == {'ok':True,'configured':configured,'connected':None,'read_only':True,'version':'0.3.0','console':{'configured':False,'code':'not_configured'}}
 
 
 def test_routes(http):
-    assert {r.path for r in api.router.routes} == {'/health','/overview','/sites','/devices','/isp'}
+    assert {r.path for r in api.router.routes} == {'/health','/overview','/sites','/devices','/isp',
+        '/console/health','/console/fingerprint','/console/devices','/console/clients','/console/wifi','/console/networks',
+        '/diagnostics','/report'}
     for route in api.router.routes:
         assert route.methods == {'GET'}
         assert not inspect.signature(route.endpoint).parameters
@@ -87,7 +89,7 @@ def test_partial_overview(http,monkeypatch,fixtures):
 def test_renderer_contract():
     source = (ROOT/'desktop/plugin.js').read_text()
     assert set(re.findall(r"from '([^']+)'",source)) == {'react','react/jsx-runtime','@hermes/plugin-sdk'}
-    assert set(re.findall(r"ctx.rest\('([^']+)'\)",source)) == {'/health','/overview','/sites','/devices','/isp'}
+    assert set(re.findall(r"ctx.rest\('([^']+)'\)",source)) == {'/health','/overview','/diagnostics','/sites','/devices','/isp','/console/clients'}
     assert 'useQuery({' in source and 'refetchInterval: 60000' in source
     assert not re.search(r'\bfetch\(|setInterval|XMLHttpRequest|https://',source)
     assert 'defaultEnabled: false' in source
@@ -122,21 +124,53 @@ const element =''', 1)
     return output.read_text()
 
 
-@pytest.mark.parametrize('view', ['overview', 'sites', 'devices', 'isp'])
+def test_first_run_part_diagnostics(tmp_path):
+    import subprocess
+    script = (ROOT/'scripts/render_screenshot.cjs').read_text()
+    original = "useQuery: options => ({ data: options.queryKey[1] === 'health' ? { configured: true, console: { configured: true } } : { data: payloads[options.queryKey[1]] }, refetch() {}, isLoading: false, isFetching: false }),"
+
+    def page(health):
+        replacement = f"useQuery: options => ({{ data: options.queryKey[1] === 'health' ? {json.dumps(health.get('data'))} : undefined, error: options.queryKey[1] === 'health' ? {json.dumps(health.get('error'))} : undefined, refetch() {{}}, isLoading: false, isFetching: false }}),"
+        output = tmp_path/'first-run.html'
+        subprocess.run(['node', '--experimental-vm-modules', '-', 'overview', str(output)],
+                       input=script.replace(original, replacement), text=True,
+                       cwd=ROOT/'scripts', check=True, capture_output=True)
+        return output.read_text()
+
+    backend = page({'error': {'message': 'Plugin not found'}})
+    assert 'Agent/backend part' in backend
+    assert 'connected backend' in backend
+    assert 'profile-scoped API key' not in backend
+
+    key = page({'data': {'configured': False}})
+    assert 'profile-scoped API key' in key
+    assert 'Agent/backend part' not in key
+
+    guide = (ROOT/'docs/INSTALL.md').read_text()
+    assert 'UniFi does not appear' in guide
+    assert 'Desktop part' in guide
+
+
+@pytest.mark.parametrize('view', ['overview', 'diagnostics', 'sites', 'devices', 'isp', 'clients'])
 def test_deterministic_previews(tmp_path, view):
     html = render_preview(tmp_path, view)
     assert html == (ROOT/f'docs/screenshots/{view}.html').read_text()
     assert html.count(' aria-pressed="true"') == 1
-    assert html.count(' aria-pressed="false"') == 3
+    assert html.count(' aria-pressed="false"') == 5
     assert '[aria-pressed="true"]' in html  # CSS must remain raw text.
     assert 'Data notes' in html and 'Read only' in html
     assert html.count('Site / host numbers are temporary and may change after refresh') == 1
     assert 'Site / host labels are temporary row numbers' not in html
-    if view != 'overview':
+    if view == 'diagnostics':
+        assert '<ol class="findings" aria-label="UniFi findings">' in html
+        assert html.count('<li class="finding ') == 5
+        assert 'What to do: ' in html and 'This version is read only' in html
+        assert '1 critical problem, 2 warnings, 1 note.' in html
+    elif view != 'overview':
         assert '<th scope="col"' in html
         assert 'tabindex="0" role="region"' in html
-        assert '1 item' in html
-        title = {'sites': 'Sites', 'devices': 'Devices', 'isp': 'ISP Health'}[view]
+        assert ('2 items' if view == 'clients' else '1 item') in html
+        title = {'sites': 'Sites', 'devices': 'Devices', 'isp': 'ISP Health', 'clients': 'Clients'}[view]
         assert html.count(f'<h2>{title}</h2>') == 1
         assert f'<section class="table-shell" aria-label="UniFi {title}">' in html
         assert f'<table aria-label="UniFi {title}">' in html
@@ -148,7 +182,7 @@ def test_display_formatting_does_not_mutate_source_payloads(tmp_path):
     payload = {'items': [
         {'name': 'Example', 'status': 'offline', 'firmwareStatus': 'updateAvailable', 'version': '', 'model': 'Unknown'},
         {'name': 'Second', 'status': 'online', 'firmwareStatus': 'upToDate', 'updateAvailable': None},
-    ], 'partial': True, 'degraded': True, 'notice': 'Only the first upstream page is shown.'}
+    ], 'partial': True, 'degraded': True, 'notice': 'Some upstream pages were not retrieved; displayed counts may be incomplete.'}
     html = render_preview(tmp_path, 'devices', payload)
     assert 'Partial data.' in html and payload['notice'] in html
     assert 'Degraded —' in html and 'Needs attention' in html
@@ -201,7 +235,7 @@ def test_firmware_only_availability_keeps_pill_without_row_attention(tmp_path):
 
 
 DISCLAIMER = ('Unofficial integration. UniFi is a trademark of Ubiquiti Inc. '
-              'This project is not affiliated with or endorsed by Ubiquiti.')
+              'This project is not affiliated with/endorsed by Ubiquiti.')
 
 
 def test_brand_and_semantic_css(tmp_path):
@@ -220,7 +254,7 @@ def test_brand_and_semantic_css(tmp_path):
     assert 'jsx(StatusDot,' in source
     assert source.count(DISCLAIMER) == 1
     assert (ROOT/'README.md').read_text().count(DISCLAIMER) == 1
-    for view in ('overview', 'sites', 'devices', 'isp'):
+    for view in ('overview', 'diagnostics', 'sites', 'devices', 'isp', 'clients'):
         html = render_preview(tmp_path, view)
         assert re.findall(r'<h1[^>]*>(.*?)</h1>', html) == ['UniFi']
         assert html.count(DISCLAIMER) == 1

@@ -67,7 +67,7 @@ def test_transport(monkeypatch, fixtures, secret, view, path):
         assert req.full_url == 'https://api.ui.com/v1' + path
         assert req.method == 'GET' and req.data is None and timeout == 10
         assert req.get_header('X-api-key') == secret
-        assert req.get_header('User-agent') == 'Hermes-UniFi/0.1.0'
+        assert req.get_header('User-agent') == 'Hermes-UniFi/0.2.0'
         assert secret not in req.full_url
     transport(monkeypatch, json.dumps(fixtures[view]).encode(), inspect=inspect)
     rows, partial, _ = c.request_data(view)
@@ -105,6 +105,7 @@ def test_http_errors(monkeypatch, secret, status, code):
     ('0.0', 0), ('5.0', 5), ('1.5', 2), ('5.3', 6),
     ('0.000001', 1), ('5.000001', 6), ('5.999999', 6),
     ('86399.000001', 86400), ('86400.1', 86400), ('999999.999999', 86400),
+    ('5.372786998', 6), ('0.0000001', 1),
     (' \t5.3\t ', 6), ('000005.300000', 6),
 ])
 def test_retry_after(value,expected):
@@ -116,7 +117,7 @@ def test_retry_after(value,expected):
     '', ' ', '-1', '-0.1', '+5', 'NaN', 'nan', 'Infinity', 'inf', '-inf',
     'Wed, 21 Oct 2015 07:28:00 GMT', 'secret', '5s', '1e2', '5.3junk',
     '.5', '5.', '5..3', '5 .3', '５.３', '5.3\n',
-    '1000000', '0000005', '0.0000001', '5.3000000', '9' * 1000,
+    '1000000', '0000005', '5.3000000000000000000', '9' * 1000,
     ' ' * 32 + '5',
 ])
 def test_retry_after_rejects_invalid(value):
@@ -164,7 +165,7 @@ def test_latest_across_duplicate_groups(fixtures, secret):
 
 def test_partial_and_empty(monkeypatch, secret):
     monkeypatch.setattr(c, 'request_data', lambda _: ([],True,secret))
-    assert c.view_data('sites') == {'items':[], 'partial':True, 'degraded':False,'notice':'Only the first upstream page is shown.'}
+    assert c.view_data('sites') == {'items':[], 'partial':True, 'degraded':False,'notice':'Some upstream pages were not retrieved; displayed counts may be incomplete.'}
 
 
 def test_neutral_device_statuses():
@@ -229,7 +230,7 @@ def test_overview_device_status(monkeypatch, secret, status, degraded):
     }
 
 
-@pytest.mark.parametrize('value,expected', [('120', 120), ('5.3', 6)])
+@pytest.mark.parametrize('value,expected', [('120', 120), ('5.3', 6), ('5.372786998', 6)])
 def test_backoff_prevents_outbound_call(monkeypatch, secret, value, expected):
     monkeypatch.setattr(c.time, 'monotonic', lambda: 100)
     transport(monkeypatch,error=HTTPError('private',429,'',{'Retry-After':value},io.BytesIO()))
@@ -240,6 +241,18 @@ def test_backoff_prevents_outbound_call(monkeypatch, secret, value, expected):
     with pytest.raises(c.SafeError) as e:
         c.request_data('devices')
     assert e.value.retry_after == expected
+
+
+def test_headerless_rate_limit_still_arms_bounded_cooldown(monkeypatch, secret):
+    monkeypatch.setattr(c.time, 'monotonic', lambda: 100)
+    transport(monkeypatch, error=HTTPError('private',429,'',{},io.BytesIO()))
+    with pytest.raises(c.SafeError) as first:
+        c.request_data('sites')
+    assert first.value.code == 'rate_limited' and first.value.retry_after == 60
+    monkeypatch.setattr(c, 'build_opener', lambda *_: pytest.fail('backoff ignored'))
+    with pytest.raises(c.SafeError) as again:
+        c.request_data('devices')
+    assert again.value.retry_after == 60
 
 
 def test_read_is_bounded(monkeypatch, secret):

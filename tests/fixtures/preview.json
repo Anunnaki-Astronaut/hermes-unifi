@@ -71,5 +71,147 @@
     "errors": [],
     "partial": false,
     "degraded": true
+  },
+  "clients": {
+    "items": [
+      {
+        "handle": "client-1",
+        "name": "Studio workstation",
+        "type": "WIRED",
+        "uplinkName": "Studio gateway",
+        "accessType": "DEFAULT",
+        "authorized": null,
+        "connectedAt": "2026-01-01T08:00:00+00:00",
+        "ipAddress": null
+      },
+      {
+        "handle": "client-2",
+        "name": "Visitor tablet",
+        "type": "WIRELESS",
+        "uplinkName": "Studio AP",
+        "accessType": "GUEST",
+        "authorized": false,
+        "connectedAt": "2026-01-01T11:30:00+00:00",
+        "ipAddress": null
+      }
+    ],
+    "partial": false,
+    "errors": [],
+    "console": {
+      "applicationVersion": "9.9.99",
+      "siteName": "Studio",
+      "siteHandle": "site-1"
+    },
+    "generatedAt": "2026-01-01T12:05:00+00:00"
+  },
+  "diagnostics": {
+    "generatedAt": "2026-01-01T12:05:00+00:00",
+    "console": {
+      "applicationVersion": "9.9.99",
+      "siteName": "Studio",
+      "siteHandle": "site-1"
+    },
+    "summary": {
+      "critical": 1,
+      "warning": 2,
+      "info": 1,
+      "ok": 1
+    },
+    "headline": "1 critical problem, 2 warnings, 1 note",
+    "readOnly": true,
+    "deviceCount": 2,
+    "clientCount": 2,
+    "sources": {
+      "console": true,
+      "consoleCode": null,
+      "cloud": true
+    },
+    "findings": [
+      {
+        "id": "device-down:device-2",
+        "severity": "critical",
+        "category": "devices",
+        "title": "Studio AP is offline",
+        "detail": "The console reports Studio AP (U7 Synthetic) as offline. Everything connected through it is affected.",
+        "recommendation": "Check its power or PoE source and the uplink cable first. If it has power and link lights, restart it from the console. If it stays down, try a different switch port or cable.",
+        "subject": {
+          "handle": "device-2",
+          "name": "Studio AP"
+        },
+        "evidence": {
+          "state": "OFFLINE"
+        },
+        "fix": {
+          "action": "RESTART_DEVICE",
+          "target": "device-2",
+          "arguments": {},
+          "available": false,
+          "requiresApproval": true,
+          "reason": "Write actions are not enabled in this version; apply the change in the UniFi console."
+        }
+      },
+      {
+        "id": "firmware-available:device-1",
+        "severity": "warning",
+        "category": "firmware",
+        "title": "Firmware update available for Studio gateway",
+        "detail": "Studio gateway is running 4.1.13 and a newer firmware is available.",
+        "recommendation": "Schedule the update during a quiet period; the device will reboot and drop clients briefly.",
+        "subject": {
+          "handle": "device-1",
+          "name": "Studio gateway"
+        },
+        "evidence": {
+          "firmwareVersion": "4.1.13"
+        },
+        "fix": null
+      },
+      {
+        "id": "port-slow:device-1",
+        "severity": "warning",
+        "category": "wired",
+        "title": "Port 3 on Studio gateway linked at 100 Mbps",
+        "detail": "This port can do 1000 Mbps but negotiated only 100 Mbps, which usually means a damaged cable, a bad connector, or an old device at the other end.",
+        "recommendation": "Reseat or replace the cable. If the connected device is gigabit-capable, test it on another port.",
+        "subject": {
+          "handle": "device-1",
+          "name": "Studio gateway"
+        },
+        "evidence": {
+          "portIdx": 3,
+          "speedMbps": 100,
+          "maxSpeedMbps": 1000
+        },
+        "fix": null
+      },
+      {
+        "id": "clients-unauthorized:site",
+        "severity": "info",
+        "category": "clients",
+        "title": "1 guest client waiting for authorization",
+        "detail": "Guests on a captive-portal network cannot reach the internet until authorized.",
+        "recommendation": "Authorize them from the console if they are expected guests.",
+        "subject": null,
+        "evidence": {
+          "count": 1
+        },
+        "fix": null
+      },
+      {
+        "id": "clients-summary:site",
+        "severity": "ok",
+        "category": "clients",
+        "title": "2 clients connected",
+        "detail": "Currently connected: 1 wired, 1 wireless.",
+        "recommendation": "No action needed.",
+        "subject": null,
+        "evidence": {
+          "wired": 1,
+          "wireless": 1,
+          "other": 0
+        },
+        "fix": null
+      }
+    ]
   }
 }
