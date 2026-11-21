@@ -4,7 +4,7 @@ See what's online, who's connected, and why a port or access point might need at
 
 [Install in Hermes](hermes://plugin/install?repo=Anunnaki-Astronaut/hermes-unifi&enable=1) · [Setup guide](docs/INSTALL.md)
 
-![Hermes for UniFi dashboard with sample data](docs/screenshots/social-preview.png)
+![Hermes for UniFi v0.3.0 Overview with sample data](docs/screenshots/overview.png)
 
 ## What it shows
 
@@ -43,7 +43,7 @@ Undefined units remain unlabeled rather than guessed: latency, downtime, uptime,
 
 ## Screenshots
 
-All screenshots use made-up data and do not show a real network. They are rendered from deterministic HTML previews of the Desktop component.
+These captures show the v0.3.0 Desktop plugin running against sample API responses in an offline preview. They use made-up data and do not show a real network.
 
 | Overview | Diagnostics | Sites |
 | --- | --- | --- |
@@ -53,7 +53,7 @@ All screenshots use made-up data and do not show a real network. They are render
 | --- | --- | --- |
 | ![Devices](docs/screenshots/devices.png) | ![ISP Health](docs/screenshots/isp.png) | ![Clients](docs/screenshots/clients.png) |
 
-The six sample views come from the checked-in HTML previews. Diagnostics is 1440×1200 to fit the full report; the other five are 1440×900. To regenerate the samples, run `python scripts/capture_screenshots.py --chrome /path/to/chrome`.
+Diagnostics is 1440×1200 to fit the full report; the other five dashboard views are 1440×900. The checked-in HTML previews are separate test fixtures and use simplified window controls.
 
 ## Requirements
 
