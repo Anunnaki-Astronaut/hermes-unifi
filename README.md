@@ -1,10 +1,12 @@
 # Hermes for UniFi
 
+![Hermes for UniFi banner — an Anunnaki keeper beside an illuminated network rack](docs/media/hermes-for-unifi.jpg)
+
+Unofficial integration. UniFi is a trademark of Ubiquiti Inc. This project is not affiliated with/endorsed by Ubiquiti.
+
 See what's online, who's connected, and why a port or access point might need attention without leaving Hermes Desktop. Hermes for UniFi is a read-only monitor and troubleshooting assistant. It uses the official UniFi Site Manager API for cloud summaries and, optionally, the official UniFi Network API for local diagnostics and a Clients tab. It can suggest what to check, but it cannot change the network.
 
 [Install in Hermes](hermes://plugin/install?repo=Anunnaki-Astronaut/hermes-unifi&enable=1) · [Setup guide](docs/INSTALL.md)
-
-![Hermes for UniFi v0.3.0 Overview with sample data](docs/screenshots/overview.png)
 
 ## What it shows
 
@@ -150,5 +152,3 @@ Tests block socket connections and DNS and mock transports. The preview renderer
 0.1.0 is the first public release. Monitoring and diagnostics remain read-only. Future write controls (for example restarting a device) require separate design and security approval, a dry-run preview, explicit in-chat confirmation, and before/after snapshots.
 
 MIT. Copyright Hermes UniFi contributors. See [LICENSE](LICENSE) and [CHANGELOG.md](CHANGELOG.md).
-
-Unofficial integration. UniFi is a trademark of Ubiquiti Inc. This project is not affiliated with/endorsed by Ubiquiti.
