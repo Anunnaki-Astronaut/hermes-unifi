@@ -40,7 +40,7 @@ def test_health(http,monkeypatch,configured):
     monkeypatch.setattr(api.client,'request_data',lambda _: pytest.fail('health contacted transport'))
     response = http.get('/health')
     assert response.status_code == 200
-    assert response.json() == {'ok':True,'configured':configured,'connected':None,'read_only':True,'version':'0.3.0','console':{'configured':False,'code':'not_configured'}}
+    assert response.json() == {'ok':True,'configured':configured,'connected':None,'read_only':True,'version':'0.4.0','console':{'configured':False,'code':'not_configured'}}
 
 
 def test_routes(http):

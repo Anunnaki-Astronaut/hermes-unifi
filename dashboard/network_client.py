@@ -23,7 +23,7 @@ from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, HTTPSHandler, ProxyHandler, Request, build_opener
 
 BASE_PATH = "/proxy/network/integration/v1"
-USER_AGENT = "Hermes-UniFi/0.3.0"
+USER_AGENT = "Hermes-UniFi/0.4.0"
 MAX_BYTES = 5 * 1024 * 1024
 MAX_PAGES = 10
 PAGE_LIMIT = 200

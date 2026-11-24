@@ -116,7 +116,7 @@ def test_request_builds_fixed_url_and_headers(fake_console, config):
     req = fake_console[0]
     assert req.full_url == "https://192.168.73.1/proxy/network/integration/v1/info"
     assert req.get_header("X-api-key") == "ephemeral-sentinel"
-    assert req.get_header("User-agent") == "Hermes-UniFi/0.3.0"
+    assert req.get_header("User-agent") == "Hermes-UniFi/0.4.0"
     assert req.get_header("Accept") == "application/json"
 
 

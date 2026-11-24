@@ -1,6 +1,6 @@
 name: unifi
 label: UniFi
-version: 0.3.0
+version: 0.4.0
 description: Read-only unofficial integration using the official UniFi Site Manager API and the official UniFi Network API on your console, with plain-English diagnostics.
 manifest_version: 1
 requires_hermes: ">=0.22.2"

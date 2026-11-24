@@ -61,12 +61,13 @@ def test_public_boundary_docs(path, terms):
 
 def test_release_version_and_license():
     # Runtime health and actual request User-Agent are covered in the API/client tests.
-    assert json.loads((ROOT / 'dashboard/manifest.json').read_text())['version'] == '0.3.0'
-    assert 'version: 0.3.0\n' in (ROOT / 'plugin.yaml').read_text()
+    assert json.loads((ROOT / 'dashboard/manifest.json').read_text())['version'] == '0.4.0'
+    assert 'version: 0.4.0\n' in (ROOT / 'plugin.yaml').read_text()
+    assert "const PLUGIN_VERSION = '0.4.0';" in (ROOT / 'desktop/plugin.js').read_text()
     assert 'Hermes UniFi contributors' in (ROOT / 'LICENSE').read_text()
     changelog = (ROOT / 'CHANGELOG.md').read_text()
     assert [line for line in changelog.splitlines() if line.startswith('## ')] == [
-        '## Unreleased', '## 0.3.0 - 2026-11-20', '## 0.1.0 - 2026-10-16'
+        '## Unreleased', '## 0.4.0 - 2026-11-22', '## 0.3.0 - 2026-11-20', '## 0.1.0 - 2026-10-16'
     ]
 
     for term in ('UNIFI_NETWORK_API_KEY', 'unifi_status', 'unifi_diagnose', 'unifi_devices', 'unifi_clients',

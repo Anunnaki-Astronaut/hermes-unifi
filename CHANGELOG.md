@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.4.0 - 2026-11-22
+
+- Added **Anunnaki** in both Light and Dark to Theme Maker. Apply either mode separately; Match Desktop stays the default, and existing palettes are kept.
+- The theme changes appearance only. UniFi monitoring, credentials, and permissions are unchanged.
+
 ## 0.3.0 - 2026-11-20
 
 - Connect an optional local UniFi console to see connected clients and check device health, Wi-Fi, ports, and WAN. Diagnostics explains what it found and what to check next. Hermes still cannot change the network.

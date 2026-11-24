@@ -21,6 +21,8 @@ The page refreshes every 60 seconds. Unknown means not reported; missing values 
 
 Open the gear in the dashboard for connection settings and appearance. Match Desktop is the default. You can also follow the system, pick light or dark, or use Theme Maker to create a palette just for UniFi.
 
+To use **Anunnaki**, open **Theme Maker**, select **Light appearance** or **Dark appearance**, then choose **Anunnaki** and click **Apply to Light** or **Apply to Dark**. Select the matching Appearance mode to see it; **System** uses the saved palette for the device's current mode. Light uses ivory and pale bronze; Dark uses Onyx, burnished bronze, and gold. Each palette is saved locally for the current Desktop connection and profile. Your connection settings stay unchanged.
+
 ![UniFi Settings with Theme Maker open and sample data](docs/screenshots/settings.png)
 
 ## What the diagnostics check

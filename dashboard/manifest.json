@@ -1,5 +1,5 @@
 {
-  "name": "unifi", "label": "UniFi", "version": "0.3.0",
+  "name": "unifi", "label": "UniFi", "version": "0.4.0",
   "description": "Read-only unofficial integration using the official UniFi Site Manager API and the official UniFi Network API, with plain-English diagnostics.", "icon": "Server",
   "tab": {"hidden": true}, "slots": [], "api": "plugin_api.py"
 }

@@ -5,7 +5,7 @@ import * as sdk from '@hermes/plugin-sdk';
 
 const ROUTE = '/unifi';
 const PRODUCT_ICON = 'target';
-const PLUGIN_VERSION = '0.3.0';
+const PLUGIN_VERSION = '0.4.0';
 let ctx;
 let preferences;
 const activeProfile = () => host.state?.profile?.get?.() || 'default';
@@ -50,6 +50,10 @@ const PRESETS = {
   Cobalt: {
     light: { background: '#F1F5FF', panel: '#E1E9FF', text: '#12234D', accent: '#234AC5', selected: '#CFDDFF' },
     dark: { background: '#10182F', panel: '#1B2850', text: '#E8F0FF', accent: '#9FB4FF', selected: '#304787' },
+  },
+  Anunnaki: {
+    light: { background: '#FAF8F3', panel: '#EAE2D3', text: '#1C1B1A', accent: '#704718', selected: '#E5D3B7' },
+    dark: { background: '#0C1420', panel: '#64442D', text: '#E9EFF6', accent: '#F1BE77', selected: '#533829' },
   },
 };
 const hexColor = value => typeof value === 'string' && value.length === 7 && /^#[\da-f]{6}$/i.test(value) ? value.toUpperCase() : null;

@@ -9,6 +9,7 @@ const presets = {
   Coast: ['F2FAFB FFFFFF 163B42 166373 D2EAF0', '10252C 193640 E5F7FA 8AD9E6 2C4D58'],
   Marigold: ['FFF9E4 F6E7AE 352600 725000 F9DF82', '211900 342800 FFF0BE FFCD4E 523D00'],
   Cobalt: ['F1F5FF E1E9FF 12234D 234AC5 CFDDFF', '10182F 1B2850 E8F0FF 9FB4FF 304787'],
+  Anunnaki: ['FAF8F3 EAE2D3 1C1B1A 704718 E5D3B7', '0C1420 64442D E9EFF6 F1BE77 533829'],
 };
 const fields = ['Background', 'Panels', 'Text', 'Accent', 'Selected row'];
 const root = view => view.elements[0].props;
@@ -22,7 +23,7 @@ const setup = async options => {
     change: (label, value) => view().find(label === 'Edit palette' ? 'select' : 'input', label).onChange({ target: { value } }) };
 };
 
-test('collapsed editor previews the exact five presets and three real dots per preset in both modes', async () => {
+test('collapsed editor previews the exact six presets and three real dots per preset in both modes', async () => {
   const f = await setup();
   const details = f.view().elements.find(node => node.type === 'details');
   assert.ok(details && !details.props.open);
@@ -43,6 +44,33 @@ test('collapsed editor previews the exact five presets and three real dots per p
     }
   }
   assert.deepEqual(f.app.writes, []);
+});
+
+test('Anunnaki uses the approved Light and Dark palettes without altering the default or saving until Apply', async () => {
+  const f = await setup();
+  assert.equal(root(f.view())['data-appearance'], 'match');
+  assert.equal(root(f.view()).style, undefined);
+  const palettes = [
+    ['Light', ['#FAF8F3', '#EAE2D3', '#1C1B1A', '#704718', '#E5D3B7']],
+    ['Dark', ['#0C1420', '#64442D', '#E9EFF6', '#F1BE77', '#533829']],
+  ];
+  for (const [mode, colors] of palettes) {
+    f.change('Edit palette', mode.toLowerCase());
+    f.click('Anunnaki');
+    assert.deepEqual(fields.map(field => f.input(`${mode} ${field} hex`)), colors);
+    assert.equal(f.control(`Apply to ${mode}`).disabled, false);
+    assert.deepEqual(f.app.writes.map(([key]) => key), mode === 'Light' ? [] : ['unifi.palette.light.v1.local:default']);
+    f.click(`Apply to ${mode}`);
+  }
+  const reload = await setup({ values: f.app.values });
+  const dashboard = reload.app.dashboard();
+  assert.equal(root(dashboard.render()).style, undefined);
+  for (const [mode, [canvas, panel, text, accent, selected]] of palettes) {
+    reload.click(mode);
+    const style = root(dashboard.render()).style;
+    assert.deepEqual([style['--unifi-canvas'], style['--ui-bg-card'], style['--ui-text-primary'], style['--unifi-accent'], style['--unifi-selected']],
+      [canvas, panel, text, accent, selected]);
+  }
 });
 
 test('independent drafts and reset, inactive and active saves, remount and System resolution', async () => {
